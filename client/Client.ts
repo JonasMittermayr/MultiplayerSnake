@@ -1,17 +1,41 @@
-const socket = io("ws://localhost:4000");
-
-
-
-
-
+import Coordinate from "../common/Coordinate"
+import Snake from "../common/Snake"
 
 const size: number = 25;
 const grid: number[][] = new Array(size); // 0=space, 1=border, 2=snake, 3=food
+
+const colors: Map<>
+//todo
 
 document.getElementById("field")!.style.width = `${size * 30}px`;
 document.getElementById("sizeDisplay")!.innerText = `Size: ${size}`;
 
 createGrid();
+
+const socket = io("ws://localhost:4000");
+
+socket.on("initialMapState", (snakes: Snake[], food: Coordinate[])=>{
+
+    for (const snake of snakes) {
+        for (const coord of snake.body) {
+            grid[coord.y][coord.x] = 2
+
+            //todo
+            document.getElementById(coord.y + "-" + coord.x)!.style()
+        }
+    }
+
+})
+
+socket.on("newMapState", (snakeHeads: Coordinate[]) =>{
+
+})
+
+
+
+
+
+
 
 function createGrid(): void {
     // Initialize 2D array
