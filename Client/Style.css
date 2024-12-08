@@ -1,0 +1,55 @@
+.myPix {
+    border: white 2px solid;
+    width: 26px;
+    height: 26px;
+    display: inline;
+}
+
+body {
+    font-family: Verdana, serif;
+ }
+
+#start_end{
+    position: absolute;
+    text-align: center;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: xxx-large;
+}
+
+#field{
+    display: flex;
+    flex-wrap: wrap;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%);
+}
+
+@keyframes vanish {
+    from {
+        opacity: 1;
+        visibility: visible;
+    }
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+#statusBar {
+    width: 87.5%;
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    bottom: -17%;
+    background-color: skyblue;
+    padding: 5%;
+    border-radius: 20px;
+}
+
+@keyframes lightUp{
+    0%{box-shadow: 0 0 50px rgba(0,255,255,0.0);}
+    50%{box-shadow: 0 0 50px rgba(0,255,255,1); border: aquamarine 2px solid}
+    100%{box-shadow: 0 0 50px rgba(0,255,255,0.0);}
+}
