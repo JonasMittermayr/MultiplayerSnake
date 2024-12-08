@@ -1,3 +1,10 @@
+const socket = io("ws://localhost:4000");
+
+
+
+
+
+
 const size: number = 25;
 const grid: number[][] = new Array(size); // 0=space, 1=border, 2=snake, 3=food
 
