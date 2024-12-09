@@ -1,18 +1,13 @@
-import {SnakeJSON} from "../server/SnakeType.js";
+import {JSONCoordinate, SnakeJSON} from "../server/JSONConversion.js";
 
-const size: number = 25;
-const grid: number[][] = new Array(size); // 0=space, 1=border, 2=snake, 3=food
+const mapSize: number = 25;
+const grid: number[][] = new Array(mapSize); // 0=space, 1=border, 2=snake, 3=food
 
 let oldSnakes: Array<SnakeJSON> = []
 
 
-
-
-
-//todo
-
-document.getElementById("field")!.style.width = `${size * 30}px`;
-document.getElementById("sizeDisplay")!.innerText = `Size: ${size}`;
+document.getElementById("field")!.style.width = `${mapSize * 30}px`;
+document.getElementById("sizeDisplay")!.innerText = `Size: ${mapSize}`;
 
 createGrid();
 
@@ -22,7 +17,7 @@ const socket = io("ws://10.0.0.38:4000")
 
 
 
-socket.on("newMapState", (snakes: SnakeJSON[]) =>{
+socket.on("newMapState", (snakes: SnakeJSON[], food: JSONCoordinate[]) => {
 
     for (const snake of oldSnakes){
         for (const coord of snake.body){
@@ -39,6 +34,10 @@ socket.on("newMapState", (snakes: SnakeJSON[]) =>{
     }
 
     oldSnakes = snakes
+
+    for (const coord of food){
+        getPixelFromDom(coord.y, coord.x).style.backgroundColor = "red"
+    }
 })
 
 socket.on("death", () => {
@@ -52,12 +51,12 @@ socket.on("death", () => {
 
 function createGrid(): void {
     // Initialize 2D array
-    for (let i = 0; i < size; i++) {
-        grid[i] = new Array(size);
+    for (let i = 0; i < mapSize; i++) {
+        grid[i] = new Array(mapSize);
 
-        for (let j = 0; j < size; j++) {
+        for (let j = 0; j < mapSize; j++) {
             // If border pixel, set 1
-            if (i === size - 1 || i === 0 || j === size - 1 || j === 0) {
+            if (i === mapSize - 1 || i === 0 || j === mapSize - 1 || j === 0) {
                 grid[i][j] = 1;
             } else {
                 grid[i][j] = 0;
@@ -66,8 +65,8 @@ function createGrid(): void {
     }
 
     // Print pixels from 2D array
-    for (let i = 0; i < size; i++) {
-        for (let j = 0; j < size; j++) {
+    for (let i = 0; i < mapSize; i++) {
+        for (let j = 0; j < mapSize; j++) {
             const pixelId: string = `${i}-${j}`;
             const pixelElement: HTMLSpanElement = document.createElement("span");
             pixelElement.id = pixelId;

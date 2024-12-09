@@ -1,6 +1,6 @@
-import Coordinate from "./Coordinate.js";
-import colors from "./Colors.js";
-import Direction from "../server/Direction.js";
+import Coordinate from "../common/Coordinate.js";
+import colors from "../common/Colors.js";
+import Direction from "./Direction.js";
 
 class Snake{
 

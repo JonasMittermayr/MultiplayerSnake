@@ -1,15 +1,35 @@
 import express from "express"
 import http from "http"
 import {Server} from "socket.io"
-import Snake from "../common/Snake.js";
+import Snake from "./Snake.js";
 import Coordinate from "../common/Coordinate.js";
 import randomRGB from "./RandomRGB.js"
-import {snakesToJsonSnakes} from "./SnakeType.js"
+import {coordsToJsonCoords, snakesToJsonSnakes} from "./JSONConversion.js"
 import Direction, {keyDirectionMapping} from "./Direction.js";
 import path from "path";
 
+const mapSize = 25
+
 //id, snake
 const snakes = new Map<string, Snake>()
+const food = new Array<Coordinate>()
+generateFood()
+
+function generateFood(){
+    let x = Math.floor(Math.random()*(mapSize-1)+1);
+    let y = Math.floor(Math.random()*(mapSize-1)+1);
+
+    if( !food.some(coord =>
+        coord.x === x && coord.y === y
+    )) {
+        food.push(new Coordinate(x,y))
+    } else{
+        //todo essen kann noch in schlangen drinnen generiert werden
+        generateFood()
+    }
+}
+
+
 const __dirname = import.meta.dirname
 
 
@@ -35,17 +55,15 @@ socketioServer.on("connection", (socket)=> {
 
     console.log("client connected.")
 
-    const row = Math.floor(Math.random() * 25) + 1
+    const row = Math.floor(Math.random() * (mapSize-2)) +1
     snakes.set(socket.id, new Snake(
-        [new Coordinate(1,row), new Coordinate(2,row), new Coordinate(3,row)],
+        [new Coordinate(1, row), new Coordinate(2, row), new Coordinate(3, row)],
         randomRGB(),
         Direction.East
     ))
 
 
-
-
-    socket.emit("newMapState", snakesToJsonSnakes(Array.from(snakes.values())))
+    socket.emit("newMapState", snakesToJsonSnakes(Array.from(snakes.values())), coordsToJsonCoords(food))
 
     socket.on("newDirection", (key: string)=>{
         const snake = snakes.get(socket.id)
