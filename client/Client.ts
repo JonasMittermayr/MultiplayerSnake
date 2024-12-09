@@ -1,9 +1,12 @@
 import Coordinate from "../common/Coordinate.js"
 //import Snake from "../common/Snake.js"
 import colors from "../common/Colors.js";
+import {SnakeJSON} from "../server/SnakeType.js";
 
 const size: number = 25;
 const grid: number[][] = new Array(size); // 0=space, 1=border, 2=snake, 3=food
+
+let oldSnakes: Array<SnakeJSON> = []
 
 
 
@@ -16,16 +19,11 @@ document.getElementById("sizeDisplay")!.innerText = `Size: ${size}`;
 
 createGrid();
 
+document.addEventListener("keydown", changeDirection);
+
 const socket = io("ws://localhost:4000")
 
-
-type Snake = {
-    color: string,
-    border: string,
-    body: [{x: number, y: number}]
-}
-
-socket.on("initialMapState", (snakes: Snake[])=>{
+socket.on("initialMapState", (snakes: SnakeJSON[])=>{
 
 
     for (const snake of snakes) {
@@ -33,19 +31,35 @@ socket.on("initialMapState", (snakes: Snake[])=>{
 
             //todo
             const pixel = document.getElementById(coord.y + "-" + coord.x)!
-            pixel.style.border = snake.border
             pixel.style.backgroundColor = snake.color
 
         }
     }
 
-})
-
-socket.on("newMapState", (snakeHeads: Coordinate[]) =>{
+    oldSnakes = snakes
 
 })
 
+socket.on("newMapState", (snakes: SnakeJSON[]) =>{
 
+    for (const snake of oldSnakes){
+        for (const pixel of snake.body){
+            document.getElementById(pixel.y + "-" + pixel.x)!.style.backgroundColor = "lightgray"
+        }
+    }
+
+    for (const snake of snakes) {
+        for (const coord of snake.body) {
+
+            //todo
+            const pixel = document.getElementById(coord.y + "-" + coord.x)!
+            pixel.style.backgroundColor = snake.color
+
+        }
+    }
+
+    oldSnakes = snakes
+})
 
 
 
@@ -92,4 +106,28 @@ function createGrid(): void {
             document.getElementById("field")!.appendChild(pixelElement);
         }
     }
+}
+
+function changeDirection(ev: KeyboardEvent) {
+
+    socket.emit("newDirection", ev.key)
+
+    /*if(!gameStarted){
+        document.getElementById("start_end").style.opacity="0";
+        document.getElementById("start_end").style.animationName="vanish";
+        document.getElementById("start_end").style.animationDuration="2s";
+
+        executor = setInterval(moveSnake, 1000/speed);
+        gameStarted = true;
+        return;
+    }*/
+
+
+
+
+    //todo serverside
+    //the direction can only be changed, if the pressed arrow key is not opposite to the direction that was set on the last interval
+    //if(!(evt.key === directions[(directions.indexOf(currentDirection)+2)%4])) {
+    //         newDirection = evt.key;
+    //     }
 }

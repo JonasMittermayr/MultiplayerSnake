@@ -1,15 +1,16 @@
 import Coordinate from "./Coordinate.js";
-import ColorPair from "./ColorPair.js";
 import colors from "./Colors.js";
+import Direction from "../server/Direction.js";
 
 class Snake{
 
-    private _body: Coordinate[]
-    private _color: ColorPair
+    body: Coordinate[]
+    color: string
+    heading: Direction
 
 
     public removeTail(document: Document){
-        const tail = this._body.pop();
+        const tail = this.body.pop();
 
         if (!tail) {
             throw new Error("Cannot remove tail: Snake body is empty.");
@@ -25,26 +26,10 @@ class Snake{
     }
 
 
-    public constructor(body: Coordinate[], color: ColorPair) {
-        this._body = body
-        this._color = color
-    }
-
-
-    get body(): Coordinate[] {
-        return this._body;
-    }
-
-    set body(value: Coordinate[]) {
-        this._body = value;
-    }
-
-    get color(): ColorPair {
-        return this._color;
-    }
-
-    set color(value: ColorPair) {
-        this._color = value;
+    public constructor(body: Coordinate[], color: string, heading: Direction) {
+        this.body = body
+        this.color = color
+        this.heading = heading
     }
 }
 
