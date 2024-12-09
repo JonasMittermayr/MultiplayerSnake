@@ -43,6 +43,10 @@ socketioServer.on("connection", (socket)=> {
         }
     })
 
+    socket.on("disconnect", ()=>{
+        snakes.delete(socket.id)
+    })
+
 })
 
 socketioServer.listen(4000)
