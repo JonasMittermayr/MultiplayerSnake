@@ -1,6 +1,3 @@
-import Coordinate from "../common/Coordinate.js"
-//import Snake from "../common/Snake.js"
-import colors from "../common/Colors.js";
 import {SnakeJSON} from "../server/SnakeType.js";
 
 const size: number = 25;
@@ -21,44 +18,32 @@ createGrid();
 
 document.addEventListener("keydown", changeDirection);
 
-const socket = io("ws://localhost:4000")
-
-socket.on("initialMapState", (snakes: SnakeJSON[])=>{
+const socket = io("ws://10.0.0.38:4000")
 
 
-    for (const snake of snakes) {
-        for (const coord of snake.body) {
-
-            //todo
-            const pixel = document.getElementById(coord.y + "-" + coord.x)!
-            pixel.style.backgroundColor = snake.color
-
-        }
-    }
-
-    oldSnakes = snakes
-
-})
 
 socket.on("newMapState", (snakes: SnakeJSON[]) =>{
 
     for (const snake of oldSnakes){
-        for (const pixel of snake.body){
-            document.getElementById(pixel.y + "-" + pixel.x)!.style.backgroundColor = "lightgray"
+        for (const coord of snake.body){
+
+            getPixelFromDom(coord.y, coord.x).style.backgroundColor = "lightgray"
         }
     }
 
     for (const snake of snakes) {
         for (const coord of snake.body) {
 
-            //todo
-            const pixel = document.getElementById(coord.y + "-" + coord.x)!
-            pixel.style.backgroundColor = snake.color
-
+            getPixelFromDom(coord.y, coord.x).style.backgroundColor = snake.color
         }
     }
 
     oldSnakes = snakes
+})
+
+socket.on("death", () => {
+    document.getElementById("heading")!.innerText = "Game Over";
+    document.getElementById("subheading")!.innerText = "Press F5 to restart.";
 })
 
 
@@ -130,4 +115,11 @@ function changeDirection(ev: KeyboardEvent) {
     //if(!(evt.key === directions[(directions.indexOf(currentDirection)+2)%4])) {
     //         newDirection = evt.key;
     //     }
+}
+
+function getPixelFromDom(y: number, x: number): HTMLElement{
+    const pixel = document.getElementById(y + "-" + x)
+
+    if(pixel) return pixel
+    else throw new Error(`Pixel not found for ID ${y}-${x}`)
 }
