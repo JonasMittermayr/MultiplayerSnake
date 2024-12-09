@@ -15,17 +15,27 @@ const socketioServer = new Server(httpServer, {
 socketioServer.on("connection", (socket)=> {
     console.log("client connected.")
 
-    const snake1 = new Snake(
-        [new Coordinate(0, 0), new Coordinate(0,1), new Coordinate(0,2)],
-        new ColorPair("solid 1px black","red")
-    )
+    const snake1 = {
+        color : "red",
+        border : "solid 1px black",
+        body : [
+            { x: 0, y: 1 },
+            { x: 1, y: 1 },
+            { x: 2, y: 1 }
+        ]
+    }
 
-    const snake2 = new Snake(
-        [new Coordinate(3, 0), new Coordinate(3,1), new Coordinate(3,2)],
-        new ColorPair("solid 1px black","blue")
-    )
+    const snake2 = {
+        color : "blue",
+        border : "solid 1px black",
+        body : [
+            { x: 0, y: 3 },
+            { x: 0, y: 4 },
+            { x: 0, y: 5 }
+        ]
+    }
 
-    socket.emit("initialMapState", [[snake1, snake2]])
+    socket.emit("initialMapState", [snake1, snake2])
 })
 
 socketioServer.listen(4000)

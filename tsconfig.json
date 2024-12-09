@@ -1,13 +1,15 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
-    "target": "es2016",
-    "module": "ESNext",
+    "target": "ES2020",
+    "module": "NodeNext",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "moduleResolution": "Node"
+    "moduleResolution": "NodeNext",
+    "sourceMap": true
   },
-  "include": ["client/**/*.ts", "server/**/*.ts"]
+  "include": ["client/**/*.ts", "server/**/*.ts", "common/**/*.ts"]
+  //compiler will only compile the files/directories included here
 }

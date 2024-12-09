@@ -1,5 +1,5 @@
 import Coordinate from "../common/Coordinate.js"
-import Snake from "../common/Snake.js"
+//import Snake from "../common/Snake.js"
 import colors from "../common/Colors.js";
 
 const size: number = 25;
@@ -18,15 +18,23 @@ createGrid();
 
 const socket = io("ws://localhost:4000")
 
+
+type Snake = {
+    color: string,
+    border: string,
+    body: [{x: number, y: number}]
+}
+
 socket.on("initialMapState", (snakes: Snake[])=>{
+
 
     for (const snake of snakes) {
         for (const coord of snake.body) {
 
             //todo
             const pixel = document.getElementById(coord.y + "-" + coord.x)!
-            pixel.style.border = colors.get(2)!.border
-            pixel.style.backgroundColor = colors.get(2)!.background
+            pixel.style.border = snake.border
+            pixel.style.backgroundColor = snake.color
 
         }
     }
