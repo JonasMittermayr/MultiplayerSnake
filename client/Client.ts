@@ -1,10 +1,14 @@
-import Coordinate from "../common/Coordinate"
-import Snake from "../common/Snake"
+import Coordinate from "../common/Coordinate.js"
+import Snake from "../common/Snake.js"
+import colors from "../common/Colors.js";
 
 const size: number = 25;
 const grid: number[][] = new Array(size); // 0=space, 1=border, 2=snake, 3=food
 
-const colors: Map<>
+
+
+
+
 //todo
 
 document.getElementById("field")!.style.width = `${size * 30}px`;
@@ -12,16 +16,18 @@ document.getElementById("sizeDisplay")!.innerText = `Size: ${size}`;
 
 createGrid();
 
-const socket = io("ws://localhost:4000");
+const socket = io("ws://localhost:4000")
 
-socket.on("initialMapState", (snakes: Snake[], food: Coordinate[])=>{
+socket.on("initialMapState", (snakes: Snake[])=>{
 
     for (const snake of snakes) {
         for (const coord of snake.body) {
-            grid[coord.y][coord.x] = 2
 
             //todo
-            document.getElementById(coord.y + "-" + coord.x)!.style()
+            const pixel = document.getElementById(coord.y + "-" + coord.x)!
+            pixel.style.border = colors.get(2)!.border
+            pixel.style.backgroundColor = colors.get(2)!.background
+
         }
     }
 
