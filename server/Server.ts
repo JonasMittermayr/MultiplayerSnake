@@ -127,12 +127,14 @@ function moveSnakes(){
             if(deadSnakeSocket){
                 deadSnakeSocket.emit("death")
                 console.log(`Emitting death to client ${id}`)
+
+                for(const carcassPixel of snakes.get(id)!.body){
+                    grid[carcassPixel.y][carcassPixel.x] = "space"
+                }
                 snakes.delete(id)
             } else{
                 throw new Error(`Snake died but Socket with id ${id} was not found, so death message was not sent.`)
             }
-
-
         } else {
 
             //if the grid at the coordinates of the new head is not "food", pop the tail of the snake
