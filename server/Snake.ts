@@ -7,6 +7,7 @@ class Snake{
     body: Coordinate[]
     color: string
     heading: Direction
+    noTailRemove: number = 0
 
 
     public removeTail(document: Document){

@@ -1,6 +1,7 @@
 import {JSONCoordinate, SnakeJSON} from "../server/JSONConversion.js";
 
-const mapSize: number = 25;
+const serverIP = "172.17.72.115"
+const mapSize= 25;
 const grid: number[][] = new Array(mapSize); // 0=space, 1=border, 2=snake, 3=food
 
 let oldSnakes: Array<SnakeJSON> = []
@@ -13,7 +14,7 @@ createGrid();
 
 document.addEventListener("keydown", changeDirection);
 
-const socket = io("ws://10.0.0.38:4000")
+const socket = io(`ws://${serverIP}:4000`)
 
 
 
@@ -34,6 +35,8 @@ socket.on("newMapState", (snakes: SnakeJSON[], food: JSONCoordinate[]) => {
     }
 
     oldSnakes = snakes
+
+    console.log(`received food location: ${JSON.stringify(food)}`)
 
     for (const coord of food){
         getPixelFromDom(coord.y, coord.x).style.backgroundColor = "red"

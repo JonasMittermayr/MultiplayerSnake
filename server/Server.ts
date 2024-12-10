@@ -14,10 +14,11 @@ const mapSize = 25
 const snakes = new Map<string, Snake>()
 const food = new Array<Coordinate>()
 generateFood()
+generateFood()
 
 function generateFood(){
-    let x = Math.floor(Math.random()*(mapSize-1)+1);
-    let y = Math.floor(Math.random()*(mapSize-1)+1);
+    let x = Math.floor(Math.random()*(mapSize-2)+1);
+    let y = Math.floor(Math.random()*(mapSize-2)+1);
 
     if( !food.some(coord =>
         coord.x === x && coord.y === y
@@ -37,7 +38,7 @@ const __dirname = import.meta.dirname
 const app = express()
 const httpServer = http.createServer(app)
 const socketioServer = new Server(httpServer, {
-    cors: { origin: "*"}
+    cors: { origin: "*" }
 })
 
 //irgendwie damit die css und js files, die die landing_page.html verlinkt richtig geladen werden
@@ -45,6 +46,8 @@ const socketioServer = new Server(httpServer, {
 console.log(path.join(__dirname, "../client"))
 
 app.use(express.static(path.join(__dirname, "../client")));
+
+
 
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../client", "landing_page.html"));
@@ -62,8 +65,11 @@ socketioServer.on("connection", (socket)=> {
         Direction.East
     ))
 
-
-    socket.emit("newMapState", snakesToJsonSnakes(Array.from(snakes.values())), coordsToJsonCoords(food))
+    console.log(coordsToJsonCoords(food))
+    socket.emit("newMapState",
+        snakesToJsonSnakes(Array.from(snakes.values())),
+        coordsToJsonCoords(food)
+    )
 
     socket.on("newDirection", (key: string)=>{
         const snake = snakes.get(socket.id)
@@ -81,8 +87,7 @@ socketioServer.on("connection", (socket)=> {
 
 socketioServer.listen(4000)
 app.listen(3000)
-
-
+console.log("Server listening on port 3000.")
 
 
 let executor = setInterval(moveSnakes, 500)
@@ -122,11 +127,25 @@ function moveSnakes(){
         } else {
             snake.body.unshift(newHead)
 
-            //remove tail
-            snake.body.pop()
+            //if food contains a coordinate that overlaps with the new head
+            let removeTail = true
+            for (const apple of food){
+                if(apple.x === newHead.x && apple.y === newHead.y){
+                    removeTail = false
+                    food.splice(food.indexOf(apple), 1)
+                    generateFood()
+                }
+            }
+
+            if(removeTail) snake.body.pop()
+
+
 
             //send updated map state to all clients
-            socketioServer.emit("newMapState", snakesToJsonSnakes(Array.from(snakes.values())))
+            socketioServer.emit("newMapState",
+                snakesToJsonSnakes(Array.from(snakes.values())),
+                coordsToJsonCoords(food)
+            )
         }
     }
 }
