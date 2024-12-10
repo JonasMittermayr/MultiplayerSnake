@@ -6,7 +6,8 @@ class Snake{
 
     body: Coordinate[]
     color: string
-    heading: Direction
+    nextIntervalDirection: Direction
+    lastIntervalDirection: Direction
     noTailRemove: number = 0
 
 
@@ -27,10 +28,16 @@ class Snake{
     }
 
 
-    public constructor(body: Coordinate[], color: string, heading: Direction) {
+    public constructor(
+        body: Coordinate[],
+        color: string,
+        nextIntervalDirection: Direction,
+        lastIntervalDirection: Direction
+    ) {
         this.body = body
         this.color = color
-        this.heading = heading
+        this.nextIntervalDirection = nextIntervalDirection
+        this.lastIntervalDirection = lastIntervalDirection
     }
 }
 

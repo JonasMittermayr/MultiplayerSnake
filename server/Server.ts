@@ -8,6 +8,7 @@ import {coordsToJsonCoords, snakesToJsonSnakes} from "./JSONConversion.js"
 import Direction, {keyDirectionMapping} from "./Direction.js";
 import path from "path";
 
+const speed = 5
 const mapSize = 25
 const grid : string[][] = []
 createGrid()
@@ -63,9 +64,10 @@ socketioServer.on("connection", (socket)=> {
     snakes.set(socket.id, new Snake(
         [new Coordinate(1, row), new Coordinate(2, row), new Coordinate(3, row)],
         randomRGB(),
+        Direction.East,
         Direction.East
     ))
-    grid[1][row] = socket.id
+    grid[row][1] = socket.id
 
     console.log(coordsToJsonCoords(food))
     socket.emit("newMapState",
@@ -73,11 +75,20 @@ socketioServer.on("connection", (socket)=> {
         coordsToJsonCoords(food)
     )
 
+
+
     socket.on("newDirection", (key: string)=>{
         const snake = snakes.get(socket.id)
-        const direction = keyDirectionMapping.get(key)
-        if(snake && direction){
-            snake.heading = direction
+        const newDirection = keyDirectionMapping.get(key)
+        if(snake && newDirection != null){
+
+            console.log(`heading: ${snake.nextIntervalDirection} new direction: ${newDirection}`)
+            if(newDirection != (snake.lastIntervalDirection+2)%4){
+                snake.nextIntervalDirection = newDirection
+            }
+
+        } else{
+            console.log(`Either Snake was not found or there was no direction associated with key ${key}`)
         }
     })
 
@@ -92,9 +103,11 @@ app.listen(3000)
 console.log("Server listening on port 3000.")
 
 
-let executor = setInterval(moveSnakes, 200)
+let executor = setInterval(moveSnakes, 1000/speed)
 
 function moveSnakes(){
+
+    //console.log("grid at beginning of movesnakes():")
 
     for (const [id, snake] of snakes.entries()){
 
@@ -104,7 +117,7 @@ function moveSnakes(){
         let yDelta = 0
         let xDelta = 0
 
-        switch(snake.heading){
+        switch(snake.nextIntervalDirection){
             case Direction.North: { yDelta-- } break;
             case Direction.South: { yDelta++ } break;
             case Direction.East: { xDelta++ } break;
@@ -120,8 +133,6 @@ function moveSnakes(){
         ){
             //prepare death
 
-            console.log(`died on coordinates y=${newHead.y} x=${newHead.x}`)
-
             const deadSnakeSocket = socketioServer.sockets.sockets.get(id)
 
             if(deadSnakeSocket){
@@ -131,6 +142,8 @@ function moveSnakes(){
                 for(const carcassPixel of snakes.get(id)!.body){
                     grid[carcassPixel.y][carcassPixel.x] = "space"
                 }
+                console.log(`died on coordinates y=${newHead.y} x=${newHead.x} because of ${fieldType}`)
+
                 snakes.delete(id)
             } else{
                 throw new Error(`Snake died but Socket with id ${id} was not found, so death message was not sent.`)
@@ -151,6 +164,8 @@ function moveSnakes(){
 
             snake.body.unshift(newHead)
             grid[newHead.y][newHead.x] = id
+
+            snake.lastIntervalDirection = snake.nextIntervalDirection
 
 
             //send updated map state to all clients

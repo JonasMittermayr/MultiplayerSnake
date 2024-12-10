@@ -1,6 +1,6 @@
 import {JSONCoordinate, SnakeJSON} from "../server/JSONConversion.js";
 
-const serverIP = "192.168.0.42"
+const serverIP = "172.17.72.115"
 const mapSize= 25;
 const grid: number[][] = new Array(mapSize); // 0=space, 1=border, 2=snake, 3=food
 

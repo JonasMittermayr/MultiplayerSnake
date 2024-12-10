@@ -1,8 +1,8 @@
 enum Direction{
-    North="w",
-    East="d",
-    South="s",
-    West="a"
+    North=0,
+    East=1,
+    South=2,
+    West=3
 }
 
 export default Direction
