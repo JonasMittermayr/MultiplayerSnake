@@ -9,10 +9,12 @@ import Direction, {keyDirectionMapping} from "./Direction.js";
 import path from "path";
 
 const mapSize = 25
+const grid : string[][] = []
+createGrid()
 
 //id, snake
 const snakes = new Map<string, Snake>()
-const food = new Array<Coordinate>()
+let food = new Array<Coordinate>()
 generateFood()
 generateFood()
 
@@ -20,10 +22,9 @@ function generateFood(){
     let x = Math.floor(Math.random()*(mapSize-2)+1);
     let y = Math.floor(Math.random()*(mapSize-2)+1);
 
-    if( !food.some(coord =>
-        coord.x === x && coord.y === y
-    )) {
+    if( grid[y][x] == "space") {
         food.push(new Coordinate(x,y))
+        grid[y][x] = "food"
     } else{
         //todo essen kann noch in schlangen drinnen generiert werden
         generateFood()
@@ -64,6 +65,7 @@ socketioServer.on("connection", (socket)=> {
         randomRGB(),
         Direction.East
     ))
+    grid[1][row] = socket.id
 
     console.log(coordsToJsonCoords(food))
     socket.emit("newMapState",
@@ -90,7 +92,7 @@ app.listen(3000)
 console.log("Server listening on port 3000.")
 
 
-let executor = setInterval(moveSnakes, 500)
+let executor = setInterval(moveSnakes, 200)
 
 function moveSnakes(){
 
@@ -109,8 +111,16 @@ function moveSnakes(){
             case Direction.West: { xDelta-- } break;
         }
         newHead = new Coordinate(currentHead.x + xDelta, currentHead.y + yDelta)
+        const fieldType = grid[newHead.y][newHead.x]
 
-        if(newHead.x >= 24 || newHead.x <= 0 || newHead.y >= 24 || newHead.y <= 0){
+
+        if(
+            //newHead.x >= mapSize-1 || newHead.x <= 0 || newHead.y >= mapSize-1 || newHead.y <= 0
+            fieldType != "food" &&  fieldType != "space"
+        ){
+            //prepare death
+
+            console.log(`died on coordinates y=${newHead.y} x=${newHead.x}`)
 
             const deadSnakeSocket = socketioServer.sockets.sockets.get(id)
 
@@ -123,22 +133,22 @@ function moveSnakes(){
             }
 
 
-
         } else {
-            snake.body.unshift(newHead)
 
-            //if food contains a coordinate that overlaps with the new head
-            let removeTail = true
-            for (const apple of food){
-                if(apple.x === newHead.x && apple.y === newHead.y){
-                    removeTail = false
-                    food.splice(food.indexOf(apple), 1)
-                    generateFood()
-                }
+            //if the grid at the coordinates of the new head is not "food", pop the tail of the snake
+            if(grid[newHead.y][newHead.x] == "food"){
+
+                //filter out the item where the foods coordinate match the head coords
+                food = food.filter( it =>  !(it.y == newHead.y && it.x == newHead.x) )
+                generateFood()
+            } else {
+                const tailcoords = snake.body.pop()!
+                grid[tailcoords.y][tailcoords.x] = "space"
             }
 
-            if(removeTail) snake.body.pop()
 
+            snake.body.unshift(newHead)
+            grid[newHead.y][newHead.x] = id
 
 
             //send updated map state to all clients
@@ -146,6 +156,23 @@ function moveSnakes(){
                 snakesToJsonSnakes(Array.from(snakes.values())),
                 coordsToJsonCoords(food)
             )
+        }
+    }
+}
+
+function createGrid() {
+
+    //initialize 2D array
+    for (let i = 0; i < mapSize; i++) {
+        grid[i] = new Array(mapSize);
+
+        for (let j = 0; j < mapSize; j++) {
+            //if border pixel, set 1
+            if (i === mapSize - 1 || i === 0 || j === mapSize - 1 || j === 0) {
+                grid[i][j] = "border";
+            } else {
+                grid[i][j] = "space";
+            }
         }
     }
 }
