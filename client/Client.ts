@@ -1,6 +1,6 @@
 import {CoordinateJSON, SnakeJSON} from "../common/JSONTypes.js";
 import PixelType from "./PixelType.js";
-import colors from "../common/Colors.js";
+import colors from "./Colors.js";
 
 const serverIP = "172.17.74.198"
 const mapSize= 25;

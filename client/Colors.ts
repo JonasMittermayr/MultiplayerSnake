@@ -1,4 +1,4 @@
-import PixelType from "../client/PixelType.js";
+import PixelType from "./PixelType.js";
 
 export class ColorPair{
 
