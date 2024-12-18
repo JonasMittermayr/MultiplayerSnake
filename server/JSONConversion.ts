@@ -1,15 +1,8 @@
 import Snake from "./Snake.js"
-import Coordinate from "../common/Coordinate.js";
+import Coordinate from "./Coordinate.js";
+import {CoordinateJSON, SnakeJSON} from "../common/JSONTypes.js";
 
-export type SnakeJSON = {
-    color: string,
-    body: {x: number, y: number}[]
-}
 
-export type JSONCoordinate = {
-    x: number,
-    y: number
-}
 
 export function snakesToJsonSnakes(snakes: Snake[]) : SnakeJSON[]{
     const snakesAsJson: SnakeJSON[] = []
@@ -25,9 +18,9 @@ export function snakesToJsonSnakes(snakes: Snake[]) : SnakeJSON[]{
     return snakesAsJson
 }
 
-export function coordsToJsonCoords(coords: Array<Coordinate>) : JSONCoordinate[]{
+export function coordsToJsonCoords(coords: Array<Coordinate>) : CoordinateJSON[]{
 
-    const jsonCoords:  JSONCoordinate[] = []
+    const jsonCoords:  CoordinateJSON[] = []
     for(const coord of coords){
         jsonCoords.push({x: coord.x, y:coord.y})
     }

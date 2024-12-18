@@ -2,7 +2,7 @@ import express from "express"
 import http from "http"
 import {Server} from "socket.io"
 import Snake from "./Snake.js";
-import Coordinate from "../common/Coordinate.js";
+import Coordinate from "./Coordinate.js";
 import randomRGB from "./RandomRGB.js"
 import {coordsToJsonCoords, snakesToJsonSnakes} from "./JSONConversion.js"
 import Direction, {keyDirectionMapping} from "./Direction.js";

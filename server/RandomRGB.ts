@@ -1,4 +1,4 @@
-export default function getRandomColor(): string {
+export default function getRandomColor() {
     const r = Math.floor(Math.random() * 256);
     const g = Math.floor(Math.random() * 256);
     const b = Math.floor(Math.random() * 256);
