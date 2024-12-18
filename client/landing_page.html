@@ -10,11 +10,23 @@
   <h4>Please enter your name to start playing!</h4>
 
 
-  <input placeholder="name">
+  <input placeholder="name" id="nameField">
 
-  <a href="client_game.html">
-    <button>Join Game</button>
-  </a>
+  <button id="joinButton">Join Game</button>
+
+    <script>
+        document.getElementById("joinButton").addEventListener("click", () => {
+            // Get the value of the username from the input field
+            const username = document.getElementById("nameField").value.trim();
+
+            if (username) {
+                // Redirect to the new page with the username as a query parameter
+                window.location.href = `client_game.html?username=${encodeURIComponent(username)}`;
+            } else {
+                alert("Please enter a username before joining the game.");
+            }
+        });
+    </script>
 
 
 </body>

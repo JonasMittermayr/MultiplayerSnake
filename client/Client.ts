@@ -6,6 +6,9 @@ const serverIP = "172.17.74.198"
 const mapSize= 25;
 const grid: PixelType[][] = new Array(mapSize)
 
+let gameStarted = false
+let socket!: SocketIOClient.Socket
+
 /** Array used for erasing the outdated snakes (from last interval) from the map */
 let oldSnakes: Array<SnakeJSON> = []
 
@@ -15,42 +18,59 @@ document.getElementById("sizeDisplay")!.innerText = `Size: ${mapSize}`
 createGrid()
 
 
-const socket = io(`ws://${serverIP}:4000`)
-
 document.addEventListener("keydown", (ev) => {
-    socket.emit("newDirection", ev.key)
+
+    if(!gameStarted){
+        gameStarted = true
+        document.getElementById("start_end")!.style.opacity="0";
+        document.getElementById("start_end")!.style.animationName="vanish";
+        document.getElementById("start_end")!.style.animationDuration="2s";
+
+        setupConnection()
+    } else{
+        socket.emit("newDirection", ev.key)
+    }
 })
 
 
-socket.on("newMapState", (snakes: SnakeJSON[], food: CoordinateJSON[]) => {
 
-    for (const snake of oldSnakes){
-        for (const coord of snake.body){
 
-            getPixelFromDom(coord.y, coord.x).style.backgroundColor = colors.get(PixelType.Space)!.background
+function setupConnection(){
+
+    socket = io(`ws://${serverIP}:4000`)
+
+    socket.on("newMapState", (snakes: SnakeJSON[], food: CoordinateJSON[]) => {
+
+        for (const snake of oldSnakes){
+            for (const coord of snake.body){
+
+                getPixelFromDom(coord.y, coord.x).style.backgroundColor = colors.get(PixelType.Space)!.background
+            }
         }
-    }
 
-    for (const snake of snakes) {
-        for (const coord of snake.body) {
+        for (const snake of snakes) {
+            for (const coord of snake.body) {
 
-            getPixelFromDom(coord.y, coord.x).style.backgroundColor = snake.color
+                getPixelFromDom(coord.y, coord.x).style.backgroundColor = snake.color
+            }
         }
-    }
 
-    oldSnakes = snakes
+        oldSnakes = snakes
 
-    console.log(`received food location: ${JSON.stringify(food)}`)
+        console.log(`received food location: ${JSON.stringify(food)}`)
 
-    for (const coord of food){
-        getPixelFromDom(coord.y, coord.x).style.backgroundColor = colors.get(PixelType.Food)!.background
-    }
-})
+        for (const coord of food){
+            getPixelFromDom(coord.y, coord.x).style.backgroundColor = colors.get(PixelType.Food)!.background
+        }
+    })
 
-socket.on("death", () => {
-    document.getElementById("heading")!.innerText = "Game Over";
-    document.getElementById("subheading")!.innerText = "Press F5 to restart.";
-})
+    socket.on("death", () => {
+        document.getElementById("start_end")!.style.opacity = "1";
+        document.getElementById("heading")!.innerText = "Game Over";
+        document.getElementById("subheading")!.innerText = "Press F5 to restart.";
+    })
+}
+
 
 
 function createGrid() {
