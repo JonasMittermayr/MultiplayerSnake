@@ -7,7 +7,7 @@ class Snake{
     color: string
     nextIntervalDirection: Direction
     lastIntervalDirection: Direction
-    noTailRemove: number = 0
+    turboActive: boolean = false
 
     public constructor(
         body: Coordinate[],

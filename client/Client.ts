@@ -13,7 +13,6 @@ let socket!: SocketIOClient.Socket
 let oldSnakes: Array<SnakeJSON> = []
 
 document.getElementById("field")!.style.width = `${mapSize * 30}px`
-document.getElementById("sizeDisplay")!.innerText = `Size: ${mapSize}`
 
 createGrid()
 
@@ -28,10 +27,14 @@ document.addEventListener("keydown", (ev) => {
 
         setupConnection()
     } else{
-        socket.emit("newDirection", ev.key)
+
+        if(ev.key == " "){
+            socket.emit("toggleturbo")
+        } else {
+            socket.emit("newDirection", ev.key)
+        }
     }
 })
-
 
 
 

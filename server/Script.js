@@ -1,3 +1,6 @@
+
+// Original single player game below
+
 const speed = 10;
 const directions = ["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"];
 const size = 25;
